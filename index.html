@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatbot Rumi → Jawi Brunei</title>
+<style>
+:root{--navy:#15324b;--teal:#0f766e;--cream:#f7f5ef;--ink:#203040;--muted:#637381;--line:#dce4e8}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#15324b,#0f766e);color:white;padding:25px 18px}
+.wrap{max-width:920px;margin:auto}h1{margin:0 0 8px;font-size:clamp(24px,4vw,36px)}header p{margin:0;line-height:1.5;opacity:.95}
+main{max-width:920px;margin:22px auto;padding:0 14px 35px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 18px #15324b0a}
+label{display:block;font-weight:700;margin-bottom:8px}textarea{width:100%;min-height:125px;resize:vertical;border:1px solid #bdcbd3;border-radius:10px;padding:13px;font-size:17px;line-height:1.5;color:var(--ink)}
+button,.upload-label{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;font-size:14px;display:inline-block}
+.primary{background:var(--teal);color:white}.secondary{background:#e8f1f2;color:#164e50}.dark{background:var(--navy);color:white}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.output{background:#f4f8f8;border:1px solid #cfe0df;border-radius:10px;padding:16px;min-height:90px;font-size:27px;line-height:1.8;direction:rtl;text-align:right;white-space:pre-wrap;overflow-wrap:anywhere}
+.small{font-size:13px;color:var(--muted);line-height:1.55}.status{font-size:13px;margin-top:10px;color:var(--teal)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:650px){.grid{grid-template-columns:1fr}}
+input[type=file]{display:none}.pill{display:inline-block;background:#e7f4f1;color:#115e59;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
+details summary{cursor:pointer;font-weight:bold}.rulebox{background:#f7f9fa;border-radius:8px;padding:12px;margin-top:10px}
+input[type=text]{padding:10px;border:1px solid #bdcbd3;border-radius:8px;width:100%;font-size:15px}
+footer{text-align:center;padding:15px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Rumi → Jawi Brunei</h1>
+  <p>Chatbot ringkas untuk membantu menukar tulisan Rumi kepada Jawi. Kaedah dan kamus boleh dikemas kini apabila fail baharu dimuat naik.</p>
+</div></header>
+<main>
+  <section class="card">
+    <span class="pill">PROTOTAIP • Versi 1.0</span>
+    <h2>Taip ayat Rumi</h2>
+    <label for="rumi">Teks dalam Rumi</label>
+    <textarea id="rumi" placeholder="Contoh: Selamat pagi. Apa khabar?"></textarea>
+    <div class="actions">
+      <button class="primary" id="convert">Tukar ke Jawi</button>
+      <button class="secondary" id="clear">Kosongkan</button>
+      <button class="secondary" id="copy">Salin hasil</button>
+    </div>
+    <p class="small">Nota: Ejaan Jawi Brunei boleh bergantung pada kaedah ejaan, kata pinjaman dan konteks. Semak hasil sebelum digunakan untuk dokumen rasmi atau bahan pengajaran.</p>
+    <label for="result">Hasil Jawi</label>
+    <div class="output" id="result" aria-live="polite">نتيجه جاوي اكن ممڤرليهتكن ديسيني</div>
+    <div class="status" id="status" role="status"></div>
+  </section>
+
+  <section class="card">
+    <h2>Kemas kini kaedah Jawi</h2>
+    <p>Untuk menambah baik hasil, muat naik fail JSON kaedah/kamus yang disediakan. Fail yang dimuat naik akan digunakan dalam pelayar ini sahaja.</p>
+    <div class="actions">
+      <label class="upload-label dark" for="rulesFile">Muat naik fail kaedah (.json)</label>
+      <input id="rulesFile" type="file" accept=".json,application/json">
+      <button class="secondary" id="downloadRules">Muat turun fail kaedah semasa</button>
+      <button class="secondary" id="resetRules">Pulihkan kaedah asas</button>
+    </div>
+    <p class="small" id="rulesStatus">Menggunakan kaedah asas yang disertakan bersama prototaip.</p>
+    <details>
+      <summary>Lihat format fail kaedah</summary>
+      <div class="rulebox">
+        <p class="small">Fail JSON mempunyai dua bahagian: <code>dictionary</code> untuk ejaan perkataan khusus, dan <code>mappings</code> untuk padanan huruf. Letakkan ejaan Jawi sebagai nilai.</p>
+        <pre id="sampleJson" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+      </div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>Tambah ejaan ke kamus peribadi</h2>
+    <p class="small">Gunakan bahagian ini untuk menguji ejaan perkataan tertentu. Untuk berkongsi dengan orang lain, muat turun fail kaedah selepas menambahkannya dan kongsikan fail itu.</p>
+    <div class="grid">
+      <div><label for="newRumi">Perkataan Rumi</label><input id="newRumi" type="text" placeholder="contoh: Brunei"></div>
+      <div><label for="newJawi">Ejaan Jawi</label><input id="newJawi" type="text" placeholder="contoh: بروني"></div>
+    </div>
+    <div class="actions"><button class="primary" id="addWord">Tambah ke kamus</button></div>
+    <p class="status" id="dictStatus"></p>
+  </section>
+  <footer>Prototaip pendidikan • Boleh dijalankan secara setempat dalam pelayar web • Tidak memerlukan akaun</footer>
+</main>
+<script>
+const BASE_RULES = {
+  "version":"1.0",
+  "description":"Kaedah asas demonstrasi sahaja. Sahkan dan tambah baik menggunakan rujukan Jawi Brunei yang berautoriti.",
+  "dictionary":{
+    "brunei":"بروني",
+    "negara":"نݢارا",
+    "darussalam":"دارالسلام",
+    "assalamualaikum":"السلام عليکم",
+    "waalaikumsalam":"وعليکم السلام",
+    "selamat":"سلامت",
+    "pagi":"ڤاݢي",
+    "petang":"ڤتاڠ",
+    "malam":"مالم",
+    "apa":"اڤا",
+    "khabar":"خبر",
+    "saya":"ساي",
+    "awak":"اوق",
+    "kita":"کيتا",
+    "kami":"کامي",
+    "makan":"ماکن",
+    "minum":"مينوم",
+    "sekolah":"سکوله",
+    "guru":"ݢورو",
+    "pelajar":"ڤلاجر",
+    "bahasa":"بهاس",
+    "melayu":"ملايو",
+    "islam":"اسلام",
+    "jawi":"جاوي",
+    "rumi":"رومي",
+    "terima":"تريما",
+    "kasih":"کاسيه",
+    "terima kasih":"تريما کاسيه",
+    "Allah":"الله",
+    "allah":"الله"
+  },
+  "mappings":{
+    "ng":"ڠ","ny":"ڽ","sy":"ش","kh":"خ","gh":"غ",
+    "a":"ا","b":"ب","c":"چ","d":"د","e":"ي","f":"ف","g":"ݢ",
+    "h":"ه","i":"ي","j":"ج","k":"ک","l":"ل","m":"م","n":"ن",
+    "o":"و","p":"ڤ","q":"ق","r":"ر","s":"س","t":"ت","u":"و",
+    "v":"ۏ","w":"و","x":"کس","y":"ي","z":"ز"
+  }
+};
+let rules = structuredClone(BASE_RULES);
+const $ = id => document.getElementById(id);
+function escapeRegExp(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function convertText(text){
+  if(!text.trim()) return "";
+  // Protect known dictionary words/phrases first, longest match first.
+  let tokens = text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’-][A-Za-zÀ-ÖØ-öø-ÿ]+)*|\d+|[^\sA-Za-zÀ-ÖØ-öø-ÿ\d]+|\s+/g) || [text];
+  let dict = Object.entries(rules.dictionary||{}).sort((a,b)=>b[0].length-a[0].length);
+  return tokens.map(token=>{
+    if(/^\s+$/.test(token) || /^\d+$/.test(token) || /^[^\p{L}\d]+$/u.test(token)) return token;
+    let lower=token.toLocaleLowerCase();
+    let found=dict.find(([key])=>key.toLocaleLowerCase()===lower);
+    if(found) return found[1];
+    let s=lower, result="", i=0;
+    const map=rules.mappings||{};
+    const keys=Object.keys(map).sort((a,b)=>b.length-a.length);
+    while(i<s.length){
+      let match=keys.find(k=>s.startsWith(k,i));
+      if(match){result+=map[match];i+=match.length}
+      else {result+=s[i];i++}
+    }
+    return result;
+  }).join("");
+}
+function setStatus(msg){$("status").textContent=msg}
+$("convert").addEventListener("click",()=>{$("result").textContent=convertText($("rumi").value);setStatus("Selesai. Semak ejaan Jawi yang terhasil.")});
+$("clear").addEventListener("click",()=>{$("rumi").value="";$("result").textContent="";setStatus("")});
+$("copy").addEventListener("click",async()=>{let value=$("result").textContent;try{await navigator.clipboard.writeText(value);setStatus("Hasil Jawi disalin.")}catch(e){setStatus("Salin hasil secara manual kerana akses papan klip tidak tersedia.")}});
+function updateSample(){$("sampleJson").textContent=JSON.stringify(rules,null,2)}
+function downloadJSON(obj,name){const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+$("downloadRules").addEventListener("click",()=>downloadJSON(rules,"kaedah-jawi-brunei.json"));
+$("resetRules").addEventListener("click",()=>{rules=structuredClone(BASE_RULES);updateSample();$("rulesStatus").textContent="Kaedah asas dipulihkan. Muat turun jika mahu menyimpan salinan.";});
+$("rulesFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{const loaded=JSON.parse(await file.text());if(!loaded.dictionary||!loaded.mappings)throw new Error("Fail mesti mengandungi 'dictionary' dan 'mappings'.");
+ rules={...structuredClone(BASE_RULES),...loaded,dictionary:{...BASE_RULES.dictionary,...loaded.dictionary},mappings:{...BASE_RULES.mappings,...loaded.mappings}};
+ updateSample();$("rulesStatus").textContent=`Fail "${file.name}" berjaya dimuat naik. Kaedah ini aktif dalam sesi/pelayar ini.`;
+ }catch(err){$("rulesStatus").textContent="Tidak dapat membaca fail: "+err.message}
+ e.target.value="";
+});
+$("addWord").addEventListener("click",()=>{
+ const r=$("newRumi").value.trim().toLocaleLowerCase(), j=$("newJawi").value.trim();
+ if(!r||!j){$("dictStatus").textContent="Isi kedua-dua ruangan dahulu.";return}
+ rules.dictionary[r]=j;updateSample();$("dictStatus").textContent=`“${r}” telah ditambah. Muat turun fail kaedah untuk menyimpan dan berkongsi.`;
+ $("newRumi").value="";$("newJawi").value="";
+});
+updateSample();
+</script>
+</body></html>
